@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  cocoapods: dantoml/cocoapods@volatile
+  # cocoapods: dantoml/cocoapods@volatile
   orb-tools: circleci/orb-tools@2
 
 executors:
@@ -12,33 +12,34 @@ executors:
     docker:
       - image: circleci/circleci-cli:latest
 
-jobs:
-  test-install:
-    executor: macos-test
-    working_directory: ~/project/test/install
-    steps:
-      - checkout:
-          path: ~/project
-      - run:
-          name: bundle install
-          command: bundle install --path .bundle --jobs 4
-      - cocoapods/fetch-specs
+# TODO: Ping marc about testing orbs
+# jobs:
+#   test-install:
+#     executor: macos-test
+#     working_directory: ~/project/test/install
+#     steps:
+#       - checkout:
+#           path: ~/project
+#       - run:
+#           name: bundle install
+#           command: bundle install --path .bundle --jobs 4
+#       - cocoapods/fetch-specs
 
-  test-install-no-bundler:
-    executor: macos-test
-    working_directory: ~/project/test/install
-    steps:
-      - checkout:
-          path: ~/project
-      - cocoapods/fetch-specs
-      - cocoapods/install:
-          use-bundler: false
+#   test-install-no-bundler:
+#     executor: macos-test
+#     working_directory: ~/project/test/install
+#     steps:
+#       - checkout:
+#           path: ~/project
+#       - cocoapods/fetch-specs
+#       - cocoapods/install:
+#           use-bundler: false
 
 workflows:
   validate-test-deploy:
     jobs:
-      - test-install
-      - test-install-no-bundler
+      # - test-install
+      # - test-install-no-bundler
       - orb-tools/pack:
           source-dir: src/
           destination-orb-path: packed/orb.yml
