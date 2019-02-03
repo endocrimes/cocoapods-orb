@@ -1,0 +1,5 @@
+version: 2.1
+
+description: |
+  An orb that allows convenient access to common CocoaPods related actions.
+
