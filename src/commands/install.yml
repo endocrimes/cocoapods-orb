@@ -1,9 +1,9 @@
 parameters:
   verbose:
-    type: bool
+    type: boolean
     default: true
   use-bundler:
-    type: bool
+    type: boolean
     default: true
 steps:
   - run: |
