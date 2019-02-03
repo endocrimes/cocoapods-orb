@@ -1,0 +1,66 @@
+version: 2.1
+
+orbs:
+  cocoapods: endocrimes/cocoapods@volatile
+  orb-tools: circleci/orb-tools@2
+
+executors:
+  macos-test:
+    macos:
+      xcode: "10.1"
+  cli:
+    docker:
+      - image: circleci/circleci-cli:latest
+
+jobs:
+  test-install:
+    executor: macos-test
+    working_directory: ~/project/test/install
+    steps:
+      - checkout:
+          path: ~/project
+      - run:
+          name: bundle install
+          command: bundle install --path .bundle --jobs 4
+      - cocoapods/fetch-specs
+
+  test-install-no-bundler:
+    executor: macos-test
+    working_directory: ~/project/test/install
+    steps:
+      - checkout:
+          path: ~/project
+      - cocoapods/fetch-specs
+      - cocoapods/install:
+          use-bundler: false
+
+workflows:
+  validate-test-deploy:
+    jobs:
+      - test-install
+      - test-install-no-bundler
+      - orb-tools/pack:
+          source-dir: src/
+          destination-orb-path: packed/orb.yml
+          workspace-path: packed/orb.yml
+          artifact-path: packed/orb.yml
+
+      - orb-tools/publish:
+          orb-path: packed/orb.yml
+          orb-ref: "endocrimes/cocoapods@dev:${CIRCLE_BRANCH}"
+          publish-token-variable: "$CIRCLECI_API_TOKEN"
+          attach-workspace: true
+          checkout: false
+          requires: [orb-tools/pack]
+
+      - orb-tools/increment:
+          orb-path: packed/orb.yml
+          orb-ref: "endocrimes/cocoapods"
+          segment: "patch"
+          publish-token-variable: "$CIRCLECI_API_TOKEN"
+          attach-workspace: true
+          checkout: false
+          requires: [orb-tools/pack]
+          filters:
+            branches:
+              only: master

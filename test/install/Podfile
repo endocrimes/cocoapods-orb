@@ -1,0 +1,9 @@
+target 'Orb Example' do
+  use_frameworks!
+
+  pod 'RxSwift'
+
+  target 'Orb ExampleTests' do
+    inherit! :search_paths
+  end
+end

@@ -1,0 +1,31 @@
+parameters:
+  verbose:
+    type: bool
+    default: true
+  use-bundler:
+    type: bool
+    default: true
+steps:
+  - run: |
+      #!/usr/bin/env bash
+      set -o errexit
+
+      REPOS_LOCATION="$HOME/.cocoapods/repos"
+      MASTER_REPO_LOCATION="$REPOS_LOCATION/master"
+
+      if [ ! -d "$MASTER_REPO_LOCATION" ]; then
+        echo "Master Specs Repo does not exist, please use the `fetch-specs` command to fetch it." >&2
+        exit 2
+      fi
+
+      BUNDLE_PREFIX="bundle exec"
+
+      if [ "<< parameters.use-bundler >>" == "false" ]; then
+        BUNDLE_PREFIX=""
+      fi
+
+      if [ "<< parameters.verbose >>" == "false" ]; then
+        $BUNDLE_PREFIX pod install --no-ansi
+      else
+        $BUNDLE_PREFIX pod install --no-ansi --verbose
+      fi
