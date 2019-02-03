@@ -1,31 +1,38 @@
 parameters:
   verbose:
     type: boolean
+    description: "Run CocoaPods with --verbose, this simplifies debugging."
     default: true
   use-bundler:
     type: boolean
+    description: >
+      Run CocoaPods from your `bundle` installation. This simplifies
+      managing versions between developer environments and CI. See
+      https://guides.cocoapods.org/using/a-gemfile.html for getting started.
     default: true
 steps:
-  - run: |
-      #!/usr/bin/env bash
-      set -o errexit
+  - run:
+      name: pod install
+      command:  |
+        #!/usr/bin/env bash
+        set -o errexit
 
-      REPOS_LOCATION="$HOME/.cocoapods/repos"
-      MASTER_REPO_LOCATION="$REPOS_LOCATION/master"
+        REPOS_LOCATION="$HOME/.cocoapods/repos"
+        MASTER_REPO_LOCATION="$REPOS_LOCATION/master"
 
-      if [ ! -d "$MASTER_REPO_LOCATION" ]; then
-        echo "Master Specs Repo does not exist, please use the `fetch-specs` command to fetch it." >&2
-        exit 2
-      fi
+        if [ ! -d "$MASTER_REPO_LOCATION" ]; then
+          echo "Master Specs Repo does not exist, please use the `fetch-specs` command to fetch it." >&2
+          exit 2
+        fi
 
-      BUNDLE_PREFIX="bundle exec"
+        BUNDLE_PREFIX="bundle exec"
 
-      if [ "<< parameters.use-bundler >>" == "false" ]; then
-        BUNDLE_PREFIX=""
-      fi
+        if [ "<< parameters.use-bundler >>" == "false" ]; then
+          BUNDLE_PREFIX=""
+        fi
 
-      if [ "<< parameters.verbose >>" == "false" ]; then
-        $BUNDLE_PREFIX pod install --no-ansi
-      else
-        $BUNDLE_PREFIX pod install --no-ansi --verbose
-      fi
+        if [ "<< parameters.verbose >>" == "false" ]; then
+          $BUNDLE_PREFIX pod install --no-ansi
+        else
+          $BUNDLE_PREFIX pod install --no-ansi --verbose
+        fi
